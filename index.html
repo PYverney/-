@@ -6,57 +6,58 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="项目报销">
-    <title>项目精细化报销</title>
+    <title>项目报销分栏版</title>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <style>
-        :root { --primary: #007AFF; --bg: #F2F2F7; --card: #FFFFFF; --gray: #8E8E93; }
+        :root { --primary: #007AFF; --bg: #F2F2F7; --card: #FFFFFF; --gray: #8E8E93; --red: #FF3B30; --green: #34C759; --orange: #FF9500; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: env(safe-area-inset-top) 12px 40px 12px; color: #1C1C1E; }
-        .card { background: var(--card); border-radius: 10px; padding: 14px; margin-top: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        h2 { font-size: 12px; margin: 0 0 10px 0; color: var(--gray); font-weight: 600; text-transform: uppercase; border-left: 3px solid var(--primary); padding-left: 8px; }
+        .card { background: var(--card); border-radius: 12px; padding: 14px; margin-top: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        h2 { font-size: 13px; margin: 0 0 10px 0; color: var(--gray); font-weight: 600; border-left: 4px solid var(--primary); padding-left: 8px; }
         
-        .project-selector { display: flex; gap: 8px; align-items: center; }
-        #projectList { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #D1D1D6; font-size: 14px; background: #fff; }
-        .btn-mini { background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; border: none; font-size: 12px; }
+        .input-item { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; margin-bottom: 4px; color: var(--gray); font-weight: 500; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #D1D1D6; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #FFF; outline: none; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        button { border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; font-size: 16px; margin-top: 5px; }
+        
+        /* 分栏标题样式 */
+        .column-header { display: flex; align-items: center; gap: 8px; margin: 15px 0 8px 0; padding-left: 4px; }
+        .column-header b { font-size: 14px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
 
-        .input-item { margin-bottom: 10px; }
-        label { display: block; font-size: 11px; margin-bottom: 3px; color: #3A3A3C; font-weight: 500; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #D1D1D6; border-radius: 8px; font-size: 15px; box-sizing: border-box; background: #FFF; outline: none; }
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
-        .btn-save { background: var(--primary); color: white; margin-top: 5px; }
-        .btn-export { background: #34C759; color: white; margin-top: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-        th { text-align: left; color: var(--gray); padding-bottom: 6px; border-bottom: 0.5px solid #D1D1D6; }
-        td { padding: 10px 0; border-bottom: 0.5px solid #F2F2F2; vertical-align: middle; }
-        .amt { text-align: right; font-weight: 600; }
-        .tag { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 10px; background: #E5E5EA; color: #3A3A3C; margin-top: 3px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 8px; overflow: hidden; }
+        td { padding: 12px; border-bottom: 0.5px solid #F2F2F2; }
+        .amt { text-align: right; font-weight: 700; }
+        .info { font-size: 11px; color: var(--gray); margin-top: 3px; }
+        .actions { margin-top: 6px; display: flex; gap: 15px; }
+        .act-btn { font-size: 11px; color: var(--primary); }
 
-        .summary { margin-top: 15px; border-top: 0.5px solid #D1D1D6; padding-top: 10px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 13px; }
-        .total-row { font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+        .total-card { background: #1C1C1E; color: white; margin-top: 20px; }
+        .total-card .amt { color: #5AC8FA; font-size: 20px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>选择项目</h2>
-    <div class="project-selector">
-        <select id="projectList" onchange="switchProject()"></select>
-        <button class="btn-mini" onclick="addNewProject()">+ 新建</button>
+    <div style="display:flex; gap:10px;">
+        <select id="projectList" style="flex:1" onchange="switchProject()"></select>
+        <button style="padding:0 15px; background:var(--primary); color:white; border-radius:8px;" onclick="addNewProject()">项目+</button>
     </div>
 </div>
 
-<div class="card">
-    <h2>录入费用</h2>
+<div class="card" id="formCard">
+    <h2 id="formTitle">录入费用</h2>
+    <input type="hidden" id="editIndex" value="-1">
     <div class="input-item">
-        <label>工作任务 / 日期（用于单次分类）</label>
-        <input type="text" id="workTask" placeholder="如：4月5日野外踏勘 / 编写报告期间">
+        <label>所属工作 / 日期</label>
+        <input type="text" id="workTask" placeholder="如：4月野外采样">
     </div>
     <div class="input-item">
         <label>费用摘要</label>
-        <input type="text" id="itemName" placeholder="如：租车费、采样餐费">
+        <input type="text" id="itemName" placeholder="如：汽车加油费">
     </div>
     <div class="row">
         <div class="input-item">
@@ -65,8 +66,9 @@
                 <option value="交通费">交通费</option>
                 <option value="住宿费">住宿费</option>
                 <option value="餐饮费">餐饮费</option>
-                <option value="劳务/补助">劳务/补助</option>
-                <option value="资料/打印">资料/打印</option>
+                <option value="劳务费">劳务费</option>
+                <option value="出差补贴">出差补贴</option>
+                <option value="资料/办公">资料/办公</option>
                 <option value="其他">其他</option>
             </select>
         </div>
@@ -82,27 +84,39 @@
         <label>金额 (元)</label>
         <input type="number" id="amount" step="0.01" placeholder="0.00">
     </div>
-    <button class="btn-save" onclick="addItem()">保存记录</button>
+    <button class="btn-save" id="btnSave" onclick="saveRecord()">保存记录</button>
+    <button id="btnCancel" style="display:none; width:100%; padding:10px; margin-top:8px; background:#E5E5EA; border-radius:8px;" onclick="resetForm()">取消修改</button>
+</div>
+
+<div id="displayArea">
+    <div class="column-header"><div class="dot" style="background:var(--green)"></div><b>有发票明细</b></div>
+    <div id="yesList"></div>
+
+    <div class="column-header" style="margin-top:20px;"><div class="dot" style="background:var(--orange)"></div><b>无发票明细</b></div>
+    <div id="noList"></div>
 </div>
 
 <div class="card">
-    <h2>项目明细 (按工作分类显示)</h2>
-    <div id="listArea"></div>
-
-    <div class="summary" id="statsArea"></div>
-    
-    <div class="summary-row total-row">
-        <span>应报销合计:</span>
-        <span id="sumTotal">¥0.00</span>
+    <h2>分类汇总统计</h2>
+    <div id="catStats"></div>
+    <div style="border-top:1px solid #EEE; margin-top:10px; padding-top:10px;">
+        <div class="summary-item"><span>有票合计:</span><span id="sumYes">¥0.00</span></div>
+        <div class="summary-item"><span>无票合计:</span><span id="sumNo">¥0.00</span></div>
     </div>
-
-    <button class="btn-export" onclick="exportToWord()">导出 Word 报销单</button>
-    <center><button style="background:none; color:red; font-size:11px; margin-top:20px; border:none; text-decoration:underline;" onclick="deleteCurrentProject()">删除整个项目数据</button></center>
 </div>
 
+<div class="card total-card">
+    <div class="summary-item" style="align-items:center;">
+        <span>项目报销总金额</span>
+        <span class="amt" id="sumTotal">¥0.00</span>
+    </div>
+</div>
+
+<button style="width:calc(100% - 24px); margin:15px 12px; padding:16px; background:var(--green); color:white; border-radius:12px; font-size:16px;" onclick="exportToWord()">导出财务专用 Word 文档</button>
+
 <script>
-    let allData = JSON.parse(localStorage.getItem('geo_project_v6')) || { "默认项目": [] };
-    let currentProj = localStorage.getItem('geo_current_proj') || "默认项目";
+    let allData = JSON.parse(localStorage.getItem('geo_v8_db')) || { "默认项目": [] };
+    let currentProj = localStorage.getItem('geo_v8_cur') || "默认项目";
 
     function init() {
         if (!allData[currentProj]) currentProj = Object.keys(allData)[0];
@@ -111,134 +125,130 @@
     }
 
     function renderProjectList() {
-        const select = document.getElementById('projectList');
-        select.innerHTML = '';
-        Object.keys(allData).forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name; opt.innerText = name;
-            if(name === currentProj) opt.selected = true;
-            select.appendChild(opt);
+        const s = document.getElementById('projectList');
+        s.innerHTML = '';
+        Object.keys(allData).forEach(n => {
+            const o = document.createElement('option');
+            o.value = n; o.innerText = n;
+            if(n === currentProj) o.selected = true;
+            s.appendChild(o);
         });
     }
 
-    function addNewProject() {
-        const name = prompt("项目名称:");
-        if (name && !allData[name]) {
-            allData[name] = []; currentProj = name; save();
-        }
-    }
-
-    function addItem() {
-        const task = document.getElementById('workTask').value || "未分类工作";
+    function saveRecord() {
+        const idx = parseInt(document.getElementById('editIndex').value);
+        const task = document.getElementById('workTask').value || "未分类";
         const name = document.getElementById('itemName').value;
         const cat = document.getElementById('category').value;
         const inv = document.getElementById('invoiceType').value;
         const amt = parseFloat(document.getElementById('amount').value);
-        
-        if(!name || isNaN(amt)) return alert("请填写摘要和金额");
-        
-        allData[currentProj].push({ task, name, cat, inv, amt, date: new Date().toLocaleDateString() });
-        save();
-        document.getElementById('itemName').value = '';
-        document.getElementById('amount').value = '';
+
+        if(!name || isNaN(amt)) return alert("请填写完整");
+
+        const data = { task, name, cat, inv, amt };
+        if(idx === -1) allData[currentProj].push(data);
+        else allData[currentProj][idx] = data;
+
+        localStorage.setItem('geo_v8_db', JSON.stringify(allData));
+        resetForm();
     }
 
     function updateUI() {
-        const listArea = document.getElementById('listArea');
-        const statsArea = document.getElementById('statsArea');
-        listArea.innerHTML = '';
-        
+        const yesDiv = document.getElementById('yesList');
+        const noDiv = document.getElementById('noList');
+        const catStats = document.getElementById('catStats');
+        yesDiv.innerHTML = ''; noDiv.innerHTML = ''; catStats.innerHTML = '';
+
         let records = allData[currentProj] || [];
-        let total = 0, allYes = 0, allNo = 0;
-        
-        // 按任务分组逻辑
-        let groups = {};
-        records.forEach(r => {
-            if(!groups[r.task]) groups[r.task] = [];
-            groups[r.task].push(r);
-            total += r.amt;
-            if(r.inv === '有发票') allYes += r.amt; else allNo += r.amt;
+        let sTotal = 0, sYes = 0, sNo = 0;
+        let cats = {};
+
+        records.forEach((r, i) => {
+            sTotal += r.amt;
+            cats[r.cat] = (cats[r.cat] || 0) + r.amt;
+
+            const html = `<table><tr><td>
+                <b>${r.name}</b><div class="info">${r.task} | ${r.cat}</div>
+                <div class="actions">
+                    <span class="act-btn" onclick="editItem(${i})">修改</span>
+                    <span class="act-btn" style="color:red" onclick="deleteItem(${i})">删除</span>
+                </div>
+                </td><td class="amt">¥${r.amt.toFixed(2)}</td></tr></table><div style="height:8px"></div>`;
+            
+            if(r.inv === '有发票') { sYes += r.amt; yesDiv.innerHTML += html; }
+            else { sNo += r.amt; noDiv.innerHTML += html; }
         });
 
-        for(let task in groups) {
-            let taskHtml = `<div style="margin-top:10px; border-bottom:1px solid #EEE; padding-bottom:5px;">
-                <b style="font-size:13px; color:var(--primary)"># ${task}</b>
-                <table style="width:100%">`;
-            groups[task].forEach(r => {
-                taskHtml += `<tr>
-                    <td>${r.name}<br/><span class="tag">${r.cat} | ${r.inv.replace('发票','')}</span></td>
-                    <td class="amt">¥${r.amt.toFixed(2)}</td>
-                </tr>`;
-            });
-            taskHtml += `</table></div>`;
-            listArea.innerHTML += taskHtml;
+        if(!yesDiv.innerHTML) yesDiv.innerHTML = '<div style="color:#CCC; font-size:12px; padding:10px;">暂无有票明细</div>';
+        if(!noDiv.innerHTML) noDiv.innerHTML = '<div style="color:#CCC; font-size:12px; padding:10px;">暂无无票明细</div>';
+
+        for(let c in cats) {
+            catStats.innerHTML += `<div class="summary-item" style="font-size:12px; color:#666"><span>${c}:</span><span>¥${cats[c].toFixed(2)}</span></div>`;
         }
 
-        statsArea.innerHTML = `
-            <div class="summary-row"><span>有票合计</span><span>¥${allYes.toFixed(2)}</span></div>
-            <div class="summary-row"><span>无票合计</span><span>¥${allNo.toFixed(2)}</span></div>`;
-        document.getElementById('sumTotal').innerText = `¥${total.toFixed(2)}`;
+        document.getElementById('sumYes').innerText = `¥${sYes.toFixed(2)}`;
+        document.getElementById('sumNo').innerText = `¥${sNo.toFixed(2)}`;
+        document.getElementById('sumTotal').innerText = `¥${sTotal.toFixed(2)}`;
     }
 
-    function save() {
-        localStorage.setItem('geo_project_v6', JSON.stringify(allData));
-        localStorage.setItem('geo_current_proj', currentProj);
-        renderProjectList(); updateUI();
+    function editItem(i) {
+        const r = allData[currentProj][i];
+        document.getElementById('editIndex').value = i;
+        document.getElementById('workTask').value = r.task;
+        document.getElementById('itemName').value = r.name;
+        document.getElementById('category').value = r.cat;
+        document.getElementById('invoiceType').value = r.inv;
+        document.getElementById('amount').value = r.amt;
+        document.getElementById('formTitle').innerText = "修改记录";
+        document.getElementById('btnSave').innerText = "确认修改";
+        document.getElementById('btnCancel').style.display = "block";
+        document.getElementById('formCard').scrollIntoView({behavior: "smooth"});
+    }
+
+    function deleteItem(i) { if(confirm("确定删除？")) { allData[currentProj].splice(i,1); localStorage.setItem('geo_v8_db', JSON.stringify(allData)); updateUI(); } }
+
+    function resetForm() {
+        document.getElementById('editIndex').value = "-1";
+        document.getElementById('itemName').value = "";
+        document.getElementById('amount').value = "";
+        document.getElementById('formTitle').innerText = "录入费用";
+        document.getElementById('btnSave').innerText = "保存记录";
+        document.getElementById('btnCancel').style.display = "none";
+        updateUI();
     }
 
     function switchProject() {
         currentProj = document.getElementById('projectList').value;
-        save();
+        localStorage.setItem('geo_v8_cur', currentProj);
+        updateUI();
     }
 
-    function deleteCurrentProject() {
-        if(confirm("确定删除整个项目？")) {
-            delete allData[currentProj];
-            currentProj = Object.keys(allData)[0] || "默认项目";
-            if(!allData[currentProj]) allData["默认项目"] = [];
-            save();
-        }
+    function addNewProject() {
+        const n = prompt("项目名称:");
+        if(n) { allData[n] = []; currentProj = n; switchProject(); renderProjectList(); }
     }
 
     function exportToWord() {
         let records = allData[currentProj];
-        if(!records || records.length === 0) return alert("没数据");
-        
-        let groups = {};
-        let total = 0, allYes = 0, allNo = 0;
-        records.forEach(r => {
-            if(!groups[r.task]) groups[r.task] = [];
-            groups[r.task].push(r);
-            total += r.amt;
-            if(r.inv === '有发票') allYes += r.amt; else allNo += r.amt;
-        });
-
-        let tableContent = "";
-        for(let task in groups) {
-            tableContent += `<tr style="background:#F2F2F2"><td colspan="4" style="border:1pt solid black;padding:5px;"><b>工作任务：${task}</b></td></tr>`;
-            groups[task].forEach(r => {
-                tableContent += `<tr>
-                    <td style="border:1pt solid black;padding:5px;">${r.name}</td>
-                    <td style="border:1pt solid black;padding:5px;text-align:center;">${r.cat}</td>
-                    <td style="border:1pt solid black;padding:5px;text-align:center;">${r.inv}</td>
-                    <td style="border:1pt solid black;padding:5px;text-align:right;">¥${r.amt.toFixed(2)}</td>
-                </tr>`;
-            });
-        }
+        const buildSection = (list, label) => {
+            if(!list.length) return "";
+            let rows = list.map(r => `<tr><td style="border:1pt solid black;padding:5px;">${r.task}</td><td style="border:1pt solid black;padding:5px;">${r.name}</td><td style="border:1pt solid black;padding:5px;text-align:center;">${r.cat}</td><td style="border:1pt solid black;padding:5px;text-align:right;">¥${r.amt.toFixed(2)}</td></tr>`).join('');
+            return `<h3 style="color:#333">${label}</h3><table style="width:100%;border-collapse:collapse;font-size:10pt;"><tr style="background:#EEE"><th>工作节点</th><th>费用说明</th><th>类别</th><th>金额</th></tr>${rows}</table>`;
+        };
 
         const html = `<html><head><meta charset="utf-8"></head><body>
-            <h2 style="text-align:center">${currentProj} 报销明细单</h2>
-            <table style="width:100%;border-collapse:collapse;font-size:10pt;">
-                <tr style="background:#DDD"><th>费用说明</th><th>分类</th><th>发票</th><th>金额</th></tr>
-                ${tableContent}
-                <tr style="font-weight:bold"><td colspan="3" style="border:1pt solid black;text-align:right;padding:5px;">有票/无票合计：</td><td style="border:1pt solid black;text-align:right;padding:5px;">有:¥${allYes.toFixed(2)} / 无:¥${allNo.toFixed(2)}</td></tr>
-                <tr style="font-weight:bold;background:#BDD7EE"><td colspan="3" style="border:1pt solid black;text-align:right;padding:10px;">报销总金额：</td><td style="border:1pt solid black;text-align:right;padding:10px;">¥${total.toFixed(2)}</td></tr>
-            </table>
-            <p style="margin-top:30px;">报销人：________________  项目人员签字：________________</p>
+            <h2 style="text-align:center">${currentProj} 报销申请书</h2>
+            ${buildSection(records.filter(r=>r.inv==='有发票'), "【第一部分：有票据项】")}
+            ${buildSection(records.filter(r=>r.inv==='无发票'), "【第二部分：无票据项/补贴】")}
+            <div style="margin-top:20px; border:2pt solid black; padding:10px; background:#F9F9F9;">
+                <b>报销总统计：</b><br/>
+                1. 有票合计：¥${records.filter(r=>r.inv==='有发票').reduce((a,b)=>a+b.amt,0).toFixed(2)}<br/>
+                2. 无票合计：¥${records.filter(r=>r.inv==='无发票').reduce((a,b)=>a+b.amt,0).toFixed(2)}<br/>
+                <b style="font-size:14pt;">应报总金额：¥${records.reduce((a,b)=>a+b.amt,0).toFixed(2)}</b>
+            </div>
+            <p style="margin-top:40px;">报销人签字：____________________ &nbsp;&nbsp;&nbsp;&nbsp; 审批人：____________________</p>
         </body></html>`;
-
-        const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
-        saveAs(blob, `${currentProj}_分项报销单.doc`);
+        saveAs(new Blob([html], {type:'application/msword;charset=utf-8'}), `${currentProj}_财务报销单.doc`);
     }
 
     init();
